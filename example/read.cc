@@ -24,18 +24,6 @@
 #include "podio/EventStore.h"
 #include "podio/ROOTReader.h"
 
-std::ostream& operator<<(std::ostream& out, const fcc::MCParticle& ptc) {
-  if(not out) return out;
-  const fcc::BareParticle& pcore = ptc.Core();
-  TLorentzVector p4 = utils::lvFromPOD(pcore.P4);
-  out<< "particle ID " << pcore.Type
-     << " e " << p4.E()
-     << " pt " << p4.Pt()
-     << " eta " << p4.Eta()
-     << " phi " << p4.Phi();
-  return out;
-}
-
 void processEvent(podio::EventStore& store,
                   bool verbose,
                   podio::ROOTReader& reader,
@@ -76,7 +64,7 @@ void processEvent(podio::EventStore& store,
       const fcc::IdNode& higgsNode = graph.getNode(higgs);
       if (verbose) {
         std::cout << higgs << std::endl;
-        std::cout << "decayproducts;" << higgsNode.children().size() << std::endl;
+        std::cout << "has daughters:" << higgsNode.children().size() << std::endl;
         std::cout << "     decay products: ";
       }
       for (auto n : visitor.traverseChildren(higgsNode)) {
@@ -99,6 +87,7 @@ int main(int argc, char** argv){
   auto reader = podio::ROOTReader();
   auto store = podio::EventStore();
   auto graph = fcc::GraphBuilder();
+
   if( argc != 2) {
     std::cerr<<"Usage: pythiafcc-read filename"<<std::endl;
     return 1;
